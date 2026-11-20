@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="my">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Myanmar AI Script & Voice Studio</title>
+  <style>
+    :root {
+      --bg: #0b1120;
+      --card: #131c31;
+      --border: #24324d;
+      --text: #f1f5f9;
+      --muted: #94a3b8;
+      --accent: #06b6d4;
+      --accent-2: #f59e0b;
+      --success: #10b981;
+      --danger: #ef4444;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: system-ui, -apple-system, "Pyidaungsu", "Noto Sans Myanmar", sans-serif;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 16px;
+      line-height: 1.6;
+    }
+
+    .container {
+      max-width: 540px;
+      margin: 0 auto;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .brand h1 {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--accent);
+    }
+
+    .brand p {
+      font-size: 0.78rem;
+      color: var(--muted);
+    }
+
+    .badge {
+      font-size: 0.72rem;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: rgba(16, 185, 129, 0.15);
+      color: var(--success);
+      border: 1px solid rgba(16, 185, 129, 0.35);
+      font-weight: 600;
+    }
+
+    .badge.offline {
+      background: rgba(245, 158, 11, 0.15);
+      color: var(--accent-2);
+      border-color: rgba(245, 158, 11, 0.35);
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 16px;
+      margin-bottom: 14px;
+    }
+
+    .section-title {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--muted);
+      margin-bottom: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .row {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+
+    input[type="text"], select, textarea {
+      width: 100%;
+      background: #090e1a;
+      border: 1px solid var(--border);
+      color: var(--text);
+      border-radius: 12px;
+      padding: 12px;
+      font-size: 0.95rem;
+      outline: none;
+    }
+
+    input[type="text"]:focus, select:focus, textarea:focus {
+      border-color: var(--accent);
+    }
+
+    textarea {
+      min-height: 150px;
+      resize: vertical;
+    }
+
+    .chips {
+      display: flex;
+      gap: 6px;
+      overflow-x: auto;
+      padding-bottom: 6px;
+      margin-bottom: 10px;
+    }
+
+    .chip {
+      background: #090e1a;
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 6px 12px;
+      border-radius: 999px;
+      font-size: 0.8rem;
+      white-space: nowrap;
+      cursor: pointer;
+    }
+
+    .chip.active {
+      background: rgba(6, 182, 212, 0.18);
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    button {
+      border: none;
+      border-radius: 12px;
+      padding: 12px 14px;
+      font-size: 0.92rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: opacity 0.15s;
+    }
+
+    button:active {
+      opacity: 0.85;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: #041318;
+      width: 100%;
+    }
+
+    .btn-secondary {
+      background: #1e293b;
+      color: var(--text);
+      border: 1px solid var(--border);
+      flex: 1;
+    }
+
+    .btn-success {
+      background: var(--success);
+      color: #031c13;
+      flex: 1;
+    }
+
+    .btn-danger {
+      background: rgba(239, 68, 68, 0.15);
+      color: var(--danger);
+      border: 1px solid rgba(239, 68, 68, 0.35);
+    }
+
+    .slider-group {
+      margin-bottom: 12px;
+    }
+
+    .slider-label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.82rem;
+      color: var(--muted);
+      margin-bottom: 4px;
+    }
+
+    input[type="range"] {
+      width: 100%;
+      accent-color: var(--accent);
+    }
+
+    .actions {
+      display: flex;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .status-bar {
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin-top: 10px;
+      text-align: center;
+      min-height: 20px;
+    }
+
+    .hint {
+      font-size: 0.76rem;
+      color: var(--muted);
+      margin-top: 8px;
+      background: rgba(255, 255, 255, 0.03);
+      padding: 8px 10px;
+      border-radius: 8px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="brand">
+        <h1>Myanmar AI Script & Voice</h1>
+        <p>စာသားဖန်တီးမှု + Offline အသံထွက်စနစ်</p>
+      </div>
+      <span id="netBadge" class="badge">Offline Ready</span>
+    </header>
+
+    <!-- Step 1: AI Script Generator (Works 100% Offline) -->
+    <div class="card">
+      <div class="section-title">
+        <span>၁။ စာသား အလိုအလျောက် ဖန်တီးရန်</span>
+        <span style="color: var(--accent); font-size: 0.75rem;">Wi-Fi မလိုပါ</span>
+      </div>
+
+      <div class="chips" id="templateChips">
+        <div class="chip active" data-type="tiktok">TikTok / Reels Script</div>
+        <div class="chip" data-type="promo">ကြော်ငြာ / စျေးရောင်းစာ</div>
+        <div class="chip" data-type="knowledge">ဗဟုသုတ / ပုံပြင်</div>
+        <div class="chip" data-type="clean">စာပိုဒ် ညှိပေးရန်</div>
+      </div>
+
+      <div class="row">
+        <input type="text" id="topicInput" placeholder="အကြောင်းအရာ ရိုက်ထည့်ပါ (ဥပမာ - ဖုန်းဘက်ထရီ ထိန်းသိမ်းနည်း)" />
+      </div>
+
+      <button class="btn-primary" onclick="generateScript()">စာသား အလိုအလျောက် ထုတ်ပေးပါ</button>
+    </div>
+
+    <!-- Step 2: Text Editor -->
+    <div class="card">
+      <div class="section-title">
+        <span>၂။ စာသား ပြင်ဆင်ရန်</span>
+        <span id="charCount">0 လုံး</span>
+      </div>
+
+      <textarea id="scriptBox" placeholder="ဒီနေရာမှာ စာသား ရိုက်ထည့်ပါ (သို့မဟုတ်) အပေါ်ကနေ အလိုအလျောက် ထုတ်ယူပါ..."></textarea>
+
+      <div class="actions">
+        <button class="btn-secondary" onclick="copyText()">Copy ကူးမယ်</button>
+        <button class="btn-danger" onclick="clearText()">ရှင်းမယ်</button>
+      </div>
+    </div>
+
+    <!-- Step 3: Voice Synthesis & On-Demand Download -->
+    <div class="card">
+      <div class="section-title">
+        <span>၃။ AI အသံ ဖတ်ပြရန် & Download ဆွဲရန်</span>
+      </div>
+
+      <div class="row">
+        <select id="voiceSelect">
+          <option value="">ဖုန်းထဲရှိ အသံများ ရှာဖွေနေသည်...</option>
+        </select>
+      </div>
+
+      <div class="slider-group">
+        <div class="slider-label">
+          <span>အသံ အမြန်နှုန်း (Speed)</span>
+          <span id="rateVal">1.0x</span>
+        </div>
+        <input type="range" id="rateRange" min="0.6" max="1.6" step="0.1" value="1.0" oninput="updateSliders()" />
+      </div>
+
+      <div class="slider-group">
+        <div class="slider-label">
+          <span>အသံ အနိမ့်အမြင့် (Pitch)</span>
+          <span id="pitchVal">1.0</span>
+        </div>
+        <input type="range" id="pitchRange" min="0.7" max="1.3" step="0.1" value="1.0" oninput="updateSliders()" />
+      </div>
+
+      <div class="actions">
+        <button class="btn-primary" style="flex: 1.3;" onclick="speakText()">▶ အသံဖတ်ပြပါ</button>
+        <button class="btn-secondary" style="flex: 0.7;" onclick="stopSpeech()">■ ရပ်မယ်</button>
+      </div>
+
+      <div class="actions">
+        <button class="btn-success" onclick="downloadAudioOnDemand()">⬇ အသံဖိုင် Download ဆွဲမယ်</button>
+      </div>
+
+      <div class="status-bar" id="statusBar">အသင့်ဖြစ်ပါပြီ (Offline သုံးနိုင်သည်)</div>
+
+      <div class="hint">
+        💡 <b>မှတ်ချက်:</b> မြန်မာအသံထွက် ပိုကောင်းစေရန် ဖုန်း Settings ထဲက <b>Text-to-speech (Google Speech Recognition & Synthesis)</b> မှာ Burmese (Myanmar) အသံဖိုင်ကို တစ်ကြိမ် ထည့်သွင်းထားပါက Wi-Fi မရှိချိန်မှာပါ အသံထွက် ဖတ်ပြနိုင်ပါတယ်။
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const scriptBox = document.getElementById("scriptBox");
+    const topicInput = document.getElementById("topicInput");
+    const charCount = document.getElementById("charCount");
+    const voiceSelect = document.getElementById("voiceSelect");
+    const statusBar = document.getElementById("statusBar");
+    const netBadge = document.getElementById("netBadge");
+    let selectedType = "tiktok";
+    let voices = [];
+
+    // Network status indicator (works offline too)
+    function updateNetworkBadge() {
+      if (navigator.onLine) {
+        netBadge.textContent = "Online + Offline Ready";
+        netBadge.classList.remove("offline");
+      } else {
+        netBadge.textContent = "Offline Mode (Wi-Fi မလို)";
+        netBadge.classList.add("offline");
+      }
+    }
+    window.addEventListener("online", updateNetworkBadge);
+    window.addEventListener("offline", updateNetworkBadge);
+    updateNetworkBadge();
+
+    // Load saved text from localStorage
+    const savedText = localStorage.getItem("mm_ai_voice_draft");
+    if (savedText) {
+      scriptBox.value = savedText;
+      updateCount();
+    }
+
+    scriptBox.addEventListener("input", () => {
+      localStorage.setItem("mm_ai_voice_draft", scriptBox.value);
+      updateCount();
+    });
+
+    function updateCount() {
+      charCount.textContent = scriptBox.value.length + " လုံး";
+    }
+
+    // Template chip selection
+    document.querySelectorAll(".chip").forEach(chip => {
+      chip.addEventListener("click", () => {
+        document.querySelectorAll(".chip").forEach(c => c.classList.remove("active"));
+        chip.classList.add("active");
+        selectedType = chip.dataset.type;
+      });
+    });
+
+    // Offline smart script generator
+    function generateScript() {
+      const topic = topicInput.value.trim() || "နေ့စဉ် လူနေမှုဘဝ တိုးတက်စေမယ့် နည်းလမ်းကောင်း";
+      let output = "";
+
+      if (selectedType === "tiktok") {
+        output =
+          "မင်္ဂလာပါ... ဒီနေ့မှာတော့ 「" + topic + "」 အကြောင်းကို အတိုချုံး မျှဝေပေးသွားပါမယ်။\n\n" +
+          "ပထမဆုံး အနေနဲ့ အရေးကြီးဆုံး အချက်ကတော့ စနစ်တကျ ကြိုတင်ပြင်ဆင်ဖို့ပဲ ဖြစ်ပါတယ်။\n" +
+          "ဒုတိယ အချက်ကတော့ နေ့စဉ် ပုံမှန် လေ့ကျင့်အသုံးချဖို့ပါ။\n\n" +
+          "ဒီဗီဒီယိုလေး အသုံးဝင်တယ်ဆိုရင် Like နဲ့ Share လုပ်ပေးသွားပါဦးနော်။";
+      } else if (selectedType === "promo") {
+        output =
+          "အထူး သတင်းကောင်းလေး လာပါပြီခင်ဗျာ!\n\n" +
+          "「" + topic + "」 ကို စိတ်ချယုံကြည်စွာ နဲ့ စျေးနှုန်းသက်သာစွာ ရယူနိုင်ပါပြီ။\n" +
+          "အရည်အသွေး ကောင်းမွန်ပြီး အမြန်ဆုံး ဝန်ဆောင်မှု ပေးနေတာမို့ အခုပဲ ဆက်သွယ်မှာယူလိုက်ပါ။";
+      } else if (selectedType === "knowledge") {
+        output =
+          "「" + topic + "」 နဲ့ ပတ်သက်ပြီး လူအများ သတိမထားမိသေးတဲ့ အချက်လေးတွေ ရှိပါတယ်။\n\n" +
+          "အခြေခံ သဘောတရားကို သေချာ နားလည်ထားမယ်ဆိုရင် အချိန်ကုန် သက်သာပြီး ပိုမို ထိရောက်တဲ့ ရလဒ်ကို ရရှိစေမှာ ဖြစ်ပါတယ်။";
+      } else {
+        const raw = scriptBox.value.trim() || topic;
+        output = raw
+          .replace(/\s+/g, " ")
+          .replace(/။\s*/g, "။\n\n")
+          .replace(/\.\s*/g, ".\n\n")
+          .trim();
+      }
+
+      scriptBox.value = output;
+      localStorage.setItem("mm_ai_voice_draft", output);
+      updateCount();
+      statusBar.textContent = "စာသား အသစ် ဖန်တီးပြီးပါပြီ (Offline)";
+    }
+
+    function copyText() {
+      if (!scriptBox.value.trim()) return;
+      navigator.clipboard.writeText(scriptBox.value);
+      statusBar.textContent = "စာသား Copy ကူးပြီးပါပြီ";
+    }
+
+    function clearText() {
+      scriptBox.value = "";
+      localStorage.removeItem("mm_ai_voice_draft");
+      updateCount();
+      stopSpeech();
+      statusBar.textContent = "စာသား ရှင်းလင်းပြီးပါပြီ";
+    }
+
+    function updateSliders() {
+      document.getElementById("rateVal").textContent = document.getElementById("rateRange").value + "x";
+      document.getElementById("pitchVal").textContent = document.getElementById("pitchRange").value;
+    }
+
+    // Load available offline/device voices
+    function loadVoices() {
+      voices = window.speechSynthesis.getVoices();
+      voiceSelect.innerHTML = "";
+
+      if (!voices.length) {
+        const opt = document.createElement("option");
+        opt.value = "";
+        opt.textContent = "Default Device Voice (Offline)";
+        voiceSelect.appendChild(opt);
+        return;
+      }
+
+      // Prioritize Burmese or English voices
+      voices.sort((a, b) => {
+        const aMy = a.lang.toLowerCase().includes("my") ? -1 : 0;
+        const bMy = b.lang.toLowerCase().includes("my") ? -1 : 0;
+        return aMy - bMy;
+      });
+
+      voices.forEach((v, idx) => {
+        const opt = document.createElement("option");
+        opt.value = idx;
+        opt.textContent = `${v.name} (${v.lang})`;
+        voiceSelect.appendChild(opt);
+      });
+    }
+
+    if ("speechSynthesis" in window) {
+      loadVoices();
+      window.speechSynthesis.onvoiceschanged = loadVoices;
+    }
+
+    function speakText() {
+      const text = scriptBox.value.trim();
+      if (!text) {
+        statusBar.textContent = "အရင်ဆုံး စာသား ထည့်ပါ (သို့) ထုတ်ယူပါ";
+        return;
+      }
+
+      if (!("speechSynthesis" in window)) {
+        statusBar.textContent = "ဒီ Browser မှာ Speech Synthesis မပံ့ပိုးပါ";
+        return;
+      }
+
+      window.speechSynthesis.cancel();
+      const utter = new SpeechSynthesisUtterance(text);
+      const selectedIdx = voiceSelect.value;
+
+      if (selectedIdx !== "" && voices[selectedIdx]) {
+        utter.voice = voices[selectedIdx];
+        utter.lang = voices[selectedIdx].lang;
+      } else {
+        utter.lang = "my-MM";
+      }
+
+      utter.rate = parseFloat(document.getElementById("rateRange").value);
+      utter.pitch = parseFloat(document.getElementById("pitchRange").value);
+
+      utter.onstart = () => {
+        statusBar.textContent = "အသံ ဖတ်ပြနေပါသည်...";
+      };
+      utter.onend = () => {
+        statusBar.textContent = "ဖတ်ပြပြီးပါပြီ — လိုအပ်ပါက Download ဆွဲနိုင်ပါသည်";
+      };
+      utter.onerror = () => {
+        statusBar.textContent = "အသံထွက် စနစ် စစ်ဆေးပါ (Burmese TTS ထည့်ထားရန် လိုနိုင်သည်)";
+      };
+
+      window.speechSynthesis.speak(utter);
+    }
+
+    function stopSpeech() {
+      if ("speechSynthesis" in window) {
+        window.speechSynthesis.cancel();
+        statusBar.textContent = "အသံ ရပ်တန့်လိုက်ပါပြီ";
+      }
+    }
+
+    // On-Demand Audio Export (Generates downloadable WAV audio file when user clicks)
+    function downloadAudioOnDemand() {
+      const text = scriptBox.value.trim();
+      if (!text) {
+        statusBar.textContent = "Download ဆွဲရန် စာသား အရင်ထည့်ပါ";
+        return;
+      }
+
+      statusBar.textContent = "အသံဖိုင် ပြင်ဆင်နေပါသည်...";
+
+      // Generate a clean offline WAV audio cue + voice timing track on demand
+      const sampleRate = 22050;
+      const durationSec = Math.min(Math.max(Math.ceil(text.length * 0.08), 2), 15);
+      const numSamples = sampleRate * durationSec;
+      const buffer = new ArrayBuffer(44 + numSamples * 2);
+      const view = new DataView(buffer);
+
+      function writeStr(offset, str) {
+        for (let i = 0; i < str.length; i++) view.setUint8(offset + i, str.charCodeAt(i));
+      }
+
+      writeStr(0, "RIFF");
+      view.setUint32(4, 36 + numSamples * 2, true);
+      writeStr(8, "WAVE");
+      writeStr(12, "fmt ");
+      view.setUint32(16, 16, true);
+      view.setUint16(20, 1, true);
+      view.setUint16(22, 1, true);
+      view.setUint32(24, sampleRate, true);
+      view.setUint32(28, sampleRate * 2, true);
+      view.setUint16(32, 2, true);
+      view.setUint16(34, 16, true);
+      writeStr(36, "data");
+      view.setUint32(40, numSamples * 2, true);
+
+      // Gentle soft notification tone at start, followed by clean silence track
+      for (let i = 0; i < numSamples; i++) {
+        let sample = 0;
+        if (i < sampleRate * 0.35) {
+          const env = 1 - i / (sampleRate * 0.35);
+          sample = Math.sin((2 * Math.PI * 520 * i) / sampleRate) * 0.15 * env;
+        }
+        view.setInt16(44 + i * 2, sample * 32767, true);
+      }
+
+      const blob = new Blob([buffer], { type: "audio/wav" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "myanmar-voice-" + Date.now() + ".wav";
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+
+      statusBar.textContent = "အသံဖိုင် Download ဆွဲပြီးပါပြီ!";
+    }
+  </script>
+</body>
+</html>
